@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 
-project(TSparseGrid3D)
+project(TAdaptiveGrid3D)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -24,18 +24,18 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 # create library
-set(LIB_SOURCES src/TSparseGrid3D.cpp)
-add_library(TSparseGrid3D SHARED ${LIB_SOURCES})
-target_link_libraries(TSparseGrid3D ROOT::Core ROOT::MathCore ROOT::Matrix)
+set(LIB_SOURCES src/TAdaptiveGrid3D.cpp)
+add_library(TAdaptiveGrid3D SHARED ${LIB_SOURCES})
+target_link_libraries(TAdaptiveGrid3D ROOT::Core ROOT::MathCore ROOT::Matrix)
 
 # install library
-install(TARGETS TSparseGrid3D DESTINATION lib)
-install(FILES include/TSparseGrid3D.h DESTINATION include)
+install(TARGETS TAdaptiveGrid3D DESTINATION lib)
+install(FILES include/TAdaptiveGrid3D.h DESTINATION include)
 
 # testing
 function(add_test_executable target)
     add_executable(${target} test/${target}.cpp)
-    target_link_libraries(${target} TSparseGrid3D)
+    target_link_libraries(${target} TAdaptiveGrid3D)
     set_target_properties(${target} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/test)
     add_test(NAME ${target} COMMAND ${target})

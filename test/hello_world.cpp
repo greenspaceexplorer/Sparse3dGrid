@@ -1,8 +1,8 @@
-#include "TSparseGrid3D.h"
+#include "TAdaptiveGrid3D.h"
 
 int main()
 {
-    TSparseGrid3D grid;
+    TAdaptiveGrid3D<int> grid;
     grid.hello();
     return 0;
 }

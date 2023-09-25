@@ -6,6 +6,7 @@
 #include <TClonesArray.h>
 #include <TObjArray.h>
 #include <TObjString.h>
+#include <TVector3.h>
 #include <TParameter.h>
 #include <algorithm>
 #include <iostream>
@@ -21,36 +22,26 @@ private:
     TObjArray fIdy;
     TObjArray fIdz;
 
-    void AddIndex(TObjArray &indexArray, Int_t index)
-    {
-        
-
-    }
+    void AddIndex(TObjArray &indexArray, Int_t index);
 
 public:
     // Default constructor
-    TAdaptiveGrid3D() : fStaticData(nullptr) {}
-
-    void Freeze()
+    TAdaptiveGrid3D(): fStaticData(nullptr) 
     {
-        if (!fStaticData)
-        { // Check if already frozen
-            // Create and populate fStaticData
-            fStaticData = new TClonesArray("TParameter", fDynamicData.GetSize());
-            // Populate fStaticData from fDynamicData
-            // ...
+        std::cout << "TAdaptiveGrid3D constructor" << std::endl;
+    };
+    ~TAdaptiveGrid3D()
+    {
+        std::cout << "TAdaptiveGrid3D destructor" << std::endl;
+    };
 
-            // Clear fDynamicData
-            fDynamicData.Clear();
-        }
-    }
-
+    void AddPoint(Int_t x, Int_t y, Int_t z, T val);
     T GetPoint(Int_t x, Int_t y, Int_t z) const
     {
         if (fStaticData)
-        {   // If frozen
-            // Access using fStaticData
-            // ...
+        { // If frozen
+          // Access using fStaticData
+          // ...
         }
         else
         {
@@ -62,14 +53,9 @@ public:
             return T{}; // Return default value if point is not found
         }
     }
+    void Freeze();
+    void hello(){std::cout << "hello world" << std::endl;};
 
-    ~TAdaptiveGrid3D()
-    {
-        if (fStaticData)
-        {
-            delete fStaticData; // Delete if it was created
-        }
-    }
 
     ClassDef(TAdaptiveGrid3D, 1)
 };
