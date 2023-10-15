@@ -4,6 +4,6 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class TAdaptiveGrid3D
+#pragma link C++ class TAdaptiveGrid3D+;
 
 #endif // __CINT__
