@@ -103,4 +103,4 @@ void generate(TAdaptiveGrid3 *root, Int_t minDepth, Int_t maxDepth, Double_t sub
 
 TAdaptiveGrid3 *findBox(TAdaptiveGrid3 *node, Double_t x, Double_t y, Double_t z);
 
-#endif // TADAPTIVEGRID3_H
+#endif // TADAPTIVEGRID3

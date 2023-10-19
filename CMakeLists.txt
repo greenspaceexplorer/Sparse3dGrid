@@ -26,24 +26,44 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_INSTALL_LIBDIR ${CMAKE_BINARY_DIR}/lib)
 
+
+MESSAGE("-- INCLUDING CUSTOM CMAKE TOOLS")
+# import colors and dictionary builder
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/colors.cmake ${CMAKE_CURRENT_SOURCE_DIR}/cmake/root_tools.cmake)
+MESSAGE("-- DONE INCLUDING CUSTOM CMAKE TOOLS")
+
 # # Files for dictionary definition
-set(LINKDEF_FILE ${CMAKE_CURRENT_SOURCE_DIR}/include/LinkDef.h)
-set(DICT_HEADER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/TAdaptiveGrid3.h)
+# set(LINKDEF_FILE ${CMAKE_CURRENT_SOURCE_DIR}/include/LinkDef.h)
+# set(DICT_HEADER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/TAdaptiveGrid3.h)
+
+set(ALL_CLASSES
+    TAdaptiveGrid3)
+
+set(DICT_CLASSES
+    TAdaptiveGrid3)
+
+string(REGEX REPLACE "([^;]+)" "src/\\1.cpp" DICT_SOURCES "${DICT_CLASSES}") 
+string(REGEX REPLACE "([^;]+)" "\\1.h"       DICT_HEADERS "${DICT_CLASSES}") 
+string(REGEX REPLACE "([^;]+)" "src/\\1.cpp" ALL_SOURCES  "${ALL_CLASSES}")  
+string(REGEX REPLACE "([^;]+)" "\\1.h"       ALL_HEADERS  "${ALL_CLASSES}")  
 
 # Generate the dictionary
-ROOT_GENERATE_DICTIONARY(G__TAdaptiveGrid3 ${DICT_HEADER_FILES} MODULE TAdaptiveGrid3 LINKDEF ${LINKDEF_FILE} )
+root_dictionary_builder(TARGET_NAME TAdaptiveGrid3DictGenerated
+                        CLASS_LIST ${DICT_CLASSES}
+                        HEADER_LIST ${DICT_HEADERS})
 
 # create library
 set(LIB_SOURCES src/TAdaptiveGrid3.cpp)
-# add_library(TAdaptiveGrid3 SHARED ${LIB_SOURCES} G__TAdaptiveGrid3.cxx)
-add_library(TAdaptiveGrid3 SHARED ${LIB_SOURCES})
+add_library(TAdaptiveGrid3 SHARED ${LIB_SOURCES} TAdaptiveGrid3DictGenerated)
+target_include_directories(TAdaptiveGrid3 PUBLIC include)
 target_link_libraries(TAdaptiveGrid3 ROOT::Core ROOT::MathCore ROOT::Matrix ROOT::Physics)
 
 
 
 # install library
 install(TARGETS TAdaptiveGrid3 DESTINATION lib)
-install(FILES include/TAdaptiveGrid3.h DESTINATION ${CMAKE_BINARY_DIR}/include)
+install(FILES ${DICT_HEADER_FILES} ${LINKDEF_FILE} DESTINATION ${CMAKE_BINARY_DIR}/include)
+# install(FILES ${DICT_HEADER_FILES} DESTINATION ${CMAKE_BINARY_DIR}/include)
 
 # testing
 function(add_test_executable target)

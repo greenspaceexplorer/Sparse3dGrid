@@ -6,6 +6,6 @@
 #pragma link C++ nestedclasses;
 #pragma link C++ nestedtypedefs;
 #pragma link C++ class std::map<int, double>;
-#pragma link C++ class TAdaptiveGrid3.h+;
-#pragma link C++ class std::vector<TAdaptiveGrid3.h>+;
+#pragma link C++ class ../include/TAdaptiveGrid3.h+;
+#pragma link C++ class std::vector<../include/TAdaptiveGrid3.h>+;
 #endif
