@@ -29,7 +29,8 @@ set(CMAKE_INSTALL_LIBDIR ${CMAKE_BINARY_DIR}/lib)
 
 MESSAGE("-- INCLUDING CUSTOM CMAKE TOOLS")
 # import colors and dictionary builder
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/colors.cmake ${CMAKE_CURRENT_SOURCE_DIR}/cmake/root_tools.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/colors.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/root_tools.cmake)
 MESSAGE("-- DONE INCLUDING CUSTOM CMAKE TOOLS")
 
 # # Files for dictionary definition
