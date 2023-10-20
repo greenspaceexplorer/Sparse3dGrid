@@ -1,4 +1,4 @@
-#include "TAdaptiveGrid3.h"
+#include "TOctreeLookup.h"
 #include "TRandom3.h"
 
 void squared(Double_t x, Double_t y, Double_t z, TVector3 *out);
@@ -19,7 +19,7 @@ int main()
     Double_t zmax = 1;
 
     // create root node
-    TAdaptiveGrid3* root = new TAdaptiveGrid3(xmin, xmax, ymin, ymax, zmin, zmax);
+    TOctreeLookup* root = new TOctreeLookup(xmin, xmax, ymin, ymax, zmin, zmax);
 
     // set tree parameters
     Int_t minDepth  = 2;
@@ -36,7 +36,7 @@ int main()
         Double_t test_point[3];
         rand->RndmArray(3, test_point);
         std::cout << "test point: " << test_point[0] << ", " << test_point[1] << ", " << test_point[2] << std::endl;
-        TAdaptiveGrid3 *bounding_box = findBox(root, test_point[0], test_point[1], test_point[2]);
+        TOctreeLookup *bounding_box = findBox(root, test_point[0], test_point[1], test_point[2]);
         out = bounding_box->interpolate(test_point[0], test_point[1], test_point[2]);
         std::cout << "interpolated value: " << out.X() << ", " << out.Y() << ", " << out.Z() << std::endl;
         std::cout << "actual value      : " << test_point[0] * test_point[0] << ", " << test_point[1] * test_point[1] << ", " << test_point[2] * test_point[2] << std::endl;

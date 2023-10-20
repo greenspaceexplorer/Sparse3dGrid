@@ -1,7 +1,7 @@
-#include "TAdaptiveGrid3.h"
-ClassImp(TAdaptiveGrid3);
+#include "TOctreeLookup.h"
+ClassImp(TOctreeLookup);
 
-TAdaptiveGrid3::TAdaptiveGrid3(){
+TOctreeLookup::TOctreeLookup(){
     parent = nullptr;
     fDepth = 0;
 
@@ -16,7 +16,7 @@ TAdaptiveGrid3::TAdaptiveGrid3(){
     }
 }
 
-TAdaptiveGrid3::TAdaptiveGrid3(Double_t xmin, Double_t xmax, Double_t ymin, Double_t ymax, Double_t zmin, Double_t zmax)
+TOctreeLookup::TOctreeLookup(Double_t xmin, Double_t xmax, Double_t ymin, Double_t ymax, Double_t zmin, Double_t zmax)
 {
     fXmin = xmin;
     fXmax = xmax;
@@ -39,11 +39,11 @@ TAdaptiveGrid3::TAdaptiveGrid3(Double_t xmin, Double_t xmax, Double_t ymin, Doub
     }
 }
 
-TAdaptiveGrid3::~TAdaptiveGrid3()
+TOctreeLookup::~TOctreeLookup()
 {
 }
 
-void TAdaptiveGrid3::setCorners(TVector3 *corner0, TVector3 *corner1, TVector3 *corner2, TVector3 *corner3, TVector3 *corner4, TVector3 *corner5, TVector3 *corner6, TVector3 *corner7)
+void TOctreeLookup::setCorners(TVector3 *corner0, TVector3 *corner1, TVector3 *corner2, TVector3 *corner3, TVector3 *corner4, TVector3 *corner5, TVector3 *corner6, TVector3 *corner7)
 {
     corners[0] = corner0;
     corners[1] = corner1;
@@ -55,7 +55,7 @@ void TAdaptiveGrid3::setCorners(TVector3 *corner0, TVector3 *corner1, TVector3 *
     corners[7] = corner7;
 };
 
-void TAdaptiveGrid3::setCorners(TVector3 **corners)
+void TOctreeLookup::setCorners(TVector3 **corners)
 {
     setCorners(corners[0],
                corners[1],
@@ -67,7 +67,7 @@ void TAdaptiveGrid3::setCorners(TVector3 **corners)
                corners[7]);
 };
 
-void TAdaptiveGrid3::setCorners(void (*func)(Double_t, Double_t, Double_t, TVector3 *))
+void TOctreeLookup::setCorners(void (*func)(Double_t, Double_t, Double_t, TVector3 *))
 {
     for (Int_t i = 0; i < 8; i++)
     {
@@ -88,7 +88,7 @@ void TAdaptiveGrid3::setCorners(void (*func)(Double_t, Double_t, Double_t, TVect
     func(fXmax, fYmax, fZmax, corners[7]);
 };
 
-void TAdaptiveGrid3::subdivide()
+void TOctreeLookup::subdivide()
 {
     if (!isLeaf())
     {
@@ -97,14 +97,14 @@ void TAdaptiveGrid3::subdivide()
     Double_t xmid = (fXmin + fXmax) / 2;
     Double_t ymid = (fYmin + fYmax) / 2;
     Double_t zmid = (fZmin + fZmax) / 2;
-    children[0] = new TAdaptiveGrid3(fXmin, xmid, fYmin, ymid, fZmin, zmid);
-    children[1] = new TAdaptiveGrid3(xmid, fXmax, fYmin, ymid, fZmin, zmid);
-    children[2] = new TAdaptiveGrid3(fXmin, xmid, ymid, fYmax, fZmin, zmid);
-    children[3] = new TAdaptiveGrid3(xmid, fXmax, ymid, fYmax, fZmin, zmid);
-    children[4] = new TAdaptiveGrid3(fXmin, xmid, fYmin, ymid, zmid, fZmax);
-    children[5] = new TAdaptiveGrid3(xmid, fXmax, fYmin, ymid, zmid, fZmax);
-    children[6] = new TAdaptiveGrid3(fXmin, xmid, ymid, fYmax, zmid, fZmax);
-    children[7] = new TAdaptiveGrid3(xmid, fXmax, ymid, fYmax, zmid, fZmax);
+    children[0] = new TOctreeLookup(fXmin, xmid, fYmin, ymid, fZmin, zmid);
+    children[1] = new TOctreeLookup(xmid, fXmax, fYmin, ymid, fZmin, zmid);
+    children[2] = new TOctreeLookup(fXmin, xmid, ymid, fYmax, fZmin, zmid);
+    children[3] = new TOctreeLookup(xmid, fXmax, ymid, fYmax, fZmin, zmid);
+    children[4] = new TOctreeLookup(fXmin, xmid, fYmin, ymid, zmid, fZmax);
+    children[5] = new TOctreeLookup(xmid, fXmax, fYmin, ymid, zmid, fZmax);
+    children[6] = new TOctreeLookup(fXmin, xmid, ymid, fYmax, zmid, fZmax);
+    children[7] = new TOctreeLookup(xmid, fXmax, ymid, fYmax, zmid, fZmax);
     for (Int_t i = 0; i < 8; i++)
     {
         children[i]->parent = this;
@@ -112,7 +112,7 @@ void TAdaptiveGrid3::subdivide()
     }
 }
 
-void TAdaptiveGrid3::setBounds(Double_t xmin, Double_t xmax, Double_t ymin, Double_t ymax, Double_t zmin, Double_t zmax)
+void TOctreeLookup::setBounds(Double_t xmin, Double_t xmax, Double_t ymin, Double_t ymax, Double_t zmin, Double_t zmax)
 {
     fXmin = xmin;
     fXmax = xmax;
@@ -122,16 +122,16 @@ void TAdaptiveGrid3::setBounds(Double_t xmin, Double_t xmax, Double_t ymin, Doub
     fZmax = zmax;
 }
 
-bool TAdaptiveGrid3::isInside(Double_t x, Double_t y, Double_t z)
+bool TOctreeLookup::isInside(Double_t x, Double_t y, Double_t z)
 {
     return x >= fXmin && x <= fXmax && y >= fYmin && y <= fYmax && z >= fZmin && z <= fZmax;
 }
-bool TAdaptiveGrid3::isInside(TVector3 *point)
+bool TOctreeLookup::isInside(TVector3 *point)
 {
     return isInside(point->X(), point->Y(), point->Z());
 }
 
-TVector3 TAdaptiveGrid3::interpolate(Double_t x, Double_t y, Double_t z)
+TVector3 TOctreeLookup::interpolate(Double_t x, Double_t y, Double_t z)
 {
     if (!isInside(x, y, z))
     {
@@ -162,7 +162,7 @@ TVector3 TAdaptiveGrid3::interpolate(Double_t x, Double_t y, Double_t z)
     return fxyz;
 }
 
-bool TAdaptiveGrid3::isLeaf()
+bool TOctreeLookup::isLeaf()
 {
     for (Int_t i = 0; i < 8; i++)
     {
@@ -174,14 +174,14 @@ bool TAdaptiveGrid3::isLeaf()
     return true;
 }
 
-bool TAdaptiveGrid3::isRoot()
+bool TOctreeLookup::isRoot()
 {
     return parent == nullptr;
 }
 
-void generate(TAdaptiveGrid3 *root, Int_t minDepth, Int_t maxDepth, Double_t subdivideThreshold, void (*func)(Double_t, Double_t, Double_t, TVector3 *))
+void generate(TOctreeLookup *root, Int_t minDepth, Int_t maxDepth, Double_t subdivideThreshold, void (*func)(Double_t, Double_t, Double_t, TVector3 *))
 {
-    std::queue<TAdaptiveGrid3 *> queue;
+    std::queue<TOctreeLookup *> queue;
     queue.push(root);
 
     Int_t max_depth = 0;
@@ -204,7 +204,7 @@ void generate(TAdaptiveGrid3 *root, Int_t minDepth, Int_t maxDepth, Double_t sub
         }
 
         // get node at front of queue and remove it
-        TAdaptiveGrid3 *node = queue.front();
+        TOctreeLookup *node = queue.front();
         queue.pop();
 
         if(node->getDepth() > max_depth){
@@ -253,7 +253,7 @@ void generate(TAdaptiveGrid3 *root, Int_t minDepth, Int_t maxDepth, Double_t sub
     }
 }
 
-TAdaptiveGrid3 *findBox(TAdaptiveGrid3 *node, Double_t x, Double_t y, Double_t z)
+TOctreeLookup *findBox(TOctreeLookup *node, Double_t x, Double_t y, Double_t z)
 {
     if (!node->isInside(x, y, z))
     {
@@ -271,4 +271,15 @@ TAdaptiveGrid3 *findBox(TAdaptiveGrid3 *node, Double_t x, Double_t y, Double_t z
         }
     }
     throw std::runtime_error("Point is not inside the grid.");
+}
+
+void save(TOctreeLookup *root, TFile *rootFile){
+    if(root == nullptr){ return;}
+
+    rootFile->cd();
+    root->Write();
+
+    for(Int_t i = 0; i < 8; i++){
+        save(root->getChild(i), rootFile);
+    }
 }

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 
-project(TAdaptiveGrid3)
+project(TOctreeLookup)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -35,13 +35,13 @@ MESSAGE("-- DONE INCLUDING CUSTOM CMAKE TOOLS")
 
 # # Files for dictionary definition
 # set(LINKDEF_FILE ${CMAKE_CURRENT_SOURCE_DIR}/include/LinkDef.h)
-# set(DICT_HEADER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/TAdaptiveGrid3.h)
+# set(DICT_HEADER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/TOctreeLookup.h)
 
 set(ALL_CLASSES
-    TAdaptiveGrid3)
+    TOctreeLookup)
 
 set(DICT_CLASSES
-    TAdaptiveGrid3)
+    TOctreeLookup)
 
 string(REGEX REPLACE "([^;]+)" "src/\\1.cpp" DICT_SOURCES "${DICT_CLASSES}") 
 string(REGEX REPLACE "([^;]+)" "\\1.h"       DICT_HEADERS "${DICT_CLASSES}") 
@@ -49,27 +49,27 @@ string(REGEX REPLACE "([^;]+)" "src/\\1.cpp" ALL_SOURCES  "${ALL_CLASSES}")
 string(REGEX REPLACE "([^;]+)" "\\1.h"       ALL_HEADERS  "${ALL_CLASSES}")  
 
 # Generate the dictionary
-root_dictionary_builder(TARGET_NAME TAdaptiveGrid3DictGenerated
+root_dictionary_builder(TARGET_NAME TOctreeLookupDictGenerated
                         CLASS_LIST ${DICT_CLASSES}
                         HEADER_LIST ${DICT_HEADERS})
 
 # create library
-set(LIB_SOURCES src/TAdaptiveGrid3.cpp)
-add_library(TAdaptiveGrid3 SHARED ${LIB_SOURCES} TAdaptiveGrid3DictGenerated)
-target_include_directories(TAdaptiveGrid3 PUBLIC include)
-target_link_libraries(TAdaptiveGrid3 ROOT::Core ROOT::MathCore ROOT::Matrix ROOT::Physics)
+set(LIB_SOURCES src/TOctreeLookup.cpp)
+add_library(TOctreeLookup SHARED ${LIB_SOURCES} TOctreeLookupDictGenerated)
+target_include_directories(TOctreeLookup PUBLIC include)
+target_link_libraries(TOctreeLookup ROOT::Core ROOT::MathCore ROOT::Matrix ROOT::Physics)
 
 
 
 # install library
-install(TARGETS TAdaptiveGrid3 DESTINATION lib)
+install(TARGETS TOctreeLookup DESTINATION lib)
 install(FILES ${DICT_HEADER_FILES} ${LINKDEF_FILE} DESTINATION ${CMAKE_BINARY_DIR}/include)
 # install(FILES ${DICT_HEADER_FILES} DESTINATION ${CMAKE_BINARY_DIR}/include)
 
 # testing
 function(add_test_executable target)
     add_executable(${target} test/${target}.cpp)
-    target_link_libraries(${target} TAdaptiveGrid3)
+    target_link_libraries(${target} TOctreeLookup)
     set_target_properties(${target} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/test)
     add_test(NAME ${target} COMMAND ${target})
