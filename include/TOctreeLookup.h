@@ -100,10 +100,12 @@ private:
 ClassDef(TOctreeLookup, 1)
 };
 
+namespace lookup{
 void generate(TOctreeLookup *root, Int_t minDepth, Int_t maxDepth, Double_t subdivideThreshold, void (*func)(Double_t, Double_t, Double_t, TVector3 *));
 
 TOctreeLookup *findBox(TOctreeLookup *node, Double_t x, Double_t y, Double_t z); 
 
 void save(TOctreeLookup *root, TFile *rootFile);
+};
 
 #endif // TOCTREELOOKUP_H

@@ -179,7 +179,7 @@ bool TOctreeLookup::isRoot()
     return parent == nullptr;
 }
 
-void generate(TOctreeLookup *root, Int_t minDepth, Int_t maxDepth, Double_t subdivideThreshold, void (*func)(Double_t, Double_t, Double_t, TVector3 *))
+void lookup::generate(TOctreeLookup *root, Int_t minDepth, Int_t maxDepth, Double_t subdivideThreshold, void (*func)(Double_t, Double_t, Double_t, TVector3 *))
 {
     std::queue<TOctreeLookup *> queue;
     queue.push(root);
@@ -253,7 +253,7 @@ void generate(TOctreeLookup *root, Int_t minDepth, Int_t maxDepth, Double_t subd
     }
 }
 
-TOctreeLookup *findBox(TOctreeLookup *node, Double_t x, Double_t y, Double_t z)
+TOctreeLookup *lookup::findBox(TOctreeLookup *node, Double_t x, Double_t y, Double_t z)
 {
     if (!node->isInside(x, y, z))
     {
@@ -267,13 +267,13 @@ TOctreeLookup *findBox(TOctreeLookup *node, Double_t x, Double_t y, Double_t z)
     {
         if (node->getChild(i)->isInside(x, y, z))
         {
-            return findBox(node->getChild(i), x, y, z);
+            return lookup::findBox(node->getChild(i), x, y, z);
         }
     }
     throw std::runtime_error("Point is not inside the grid.");
 }
 
-void save(TOctreeLookup *root, TFile *rootFile){
+void lookup::save(TOctreeLookup *root, TFile *rootFile){
     if(root == nullptr){ return;}
 
     rootFile->cd();

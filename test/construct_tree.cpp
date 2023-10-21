@@ -27,7 +27,7 @@ int main()
     Double_t subdivideThreshold = 0.001;
     
     // generate tree
-    generate(root, minDepth, maxDepth, subdivideThreshold, squared);
+    lookup::generate(root, minDepth, maxDepth, subdivideThreshold, squared);
 
     TRandom3 *rand = new TRandom3(123);
 
@@ -36,7 +36,7 @@ int main()
         Double_t test_point[3];
         rand->RndmArray(3, test_point);
         std::cout << "test point: " << test_point[0] << ", " << test_point[1] << ", " << test_point[2] << std::endl;
-        TOctreeLookup *bounding_box = findBox(root, test_point[0], test_point[1], test_point[2]);
+        TOctreeLookup *bounding_box = lookup::findBox(root, test_point[0], test_point[1], test_point[2]);
         out = bounding_box->interpolate(test_point[0], test_point[1], test_point[2]);
         std::cout << "interpolated value: " << out.X() << ", " << out.Y() << ", " << out.Z() << std::endl;
         std::cout << "actual value      : " << test_point[0] * test_point[0] << ", " << test_point[1] * test_point[1] << ", " << test_point[2] * test_point[2] << std::endl;
