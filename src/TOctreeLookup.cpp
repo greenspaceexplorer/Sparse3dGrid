@@ -1,4 +1,5 @@
 #include "TOctreeLookup.h"
+#include <functional>
 ClassImp(TOctreeLookup);
 
 TOctreeLookup::TOctreeLookup(){
