@@ -9,6 +9,7 @@
 #include <TList.h>
 #include <utility>
 #include <queue>
+#include <functional>
 
 
 
@@ -22,7 +23,7 @@ public:
 
     void setCorners(TVector3 *corner0, TVector3 *corner1, TVector3 *corner2, TVector3 *corner3, TVector3 *corner4, TVector3 *corner5, TVector3 *corner6, TVector3 *corner7);
     void setCorners(TVector3 **corners);
-    void setCorners(void (*func)(Double_t, Double_t, Double_t, TVector3 *));
+    void setCorners(std::function<void(Double_t, Double_t, Double_t, TVector3 *)> func);
 
     TVector3 *getCorner(Int_t i)
     {
@@ -101,7 +102,11 @@ ClassDef(TOctreeLookup, 1)
 };
 
 namespace lookup{
-void generate(TOctreeLookup *root, Int_t minDepth, Int_t maxDepth, Double_t subdivideThreshold, void (*func)(Double_t, Double_t, Double_t, TVector3 *));
+void generate(TOctreeLookup *root, 
+                    Int_t minDepth, 
+                    Int_t maxDepth, 
+                    Double_t subdivideThreshold, 
+                    std::function<void(Double_t, Double_t, Double_t, TVector3 *)> func);
 
 TOctreeLookup *findBox(TOctreeLookup *node, Double_t x, Double_t y, Double_t z); 
 

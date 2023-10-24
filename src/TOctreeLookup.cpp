@@ -67,7 +67,7 @@ void TOctreeLookup::setCorners(TVector3 **corners)
                corners[7]);
 };
 
-void TOctreeLookup::setCorners(void (*func)(Double_t, Double_t, Double_t, TVector3 *))
+void TOctreeLookup::setCorners(std::function<void(Double_t, Double_t, Double_t, TVector3 *)> func)
 {
     for (Int_t i = 0; i < 8; i++)
     {
@@ -179,7 +179,7 @@ bool TOctreeLookup::isRoot()
     return parent == nullptr;
 }
 
-void lookup::generate(TOctreeLookup *root, Int_t minDepth, Int_t maxDepth, Double_t subdivideThreshold, void (*func)(Double_t, Double_t, Double_t, TVector3 *))
+void lookup::generate(TOctreeLookup *root, Int_t minDepth, Int_t maxDepth, Double_t subdivideThreshold, std::function<void(Double_t, Double_t, Double_t, TVector3 *)> func)
 {
     std::queue<TOctreeLookup *> queue;
     queue.push(root);
