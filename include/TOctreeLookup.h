@@ -21,6 +21,7 @@ public:
     ~TOctreeLookup();
 
 
+    void setCorner(uint i, TVector3 *vec){corners[i] = vec;};
     void setCorners(TVector3 *corner0, TVector3 *corner1, TVector3 *corner2, TVector3 *corner3, TVector3 *corner4, TVector3 *corner5, TVector3 *corner6, TVector3 *corner7);
     void setCorners(TVector3 **corners);
     void setCorners(std::function<void(Double_t, Double_t, Double_t, TVector3 *)> func);
@@ -37,6 +38,19 @@ public:
         }
         return corners[i];
     };
+
+    // Corner indexing:
+    // 2----------3
+    // |          |
+    // |  bottom  |
+    // |          |
+    // 0----------1
+    //
+    // 6----------7
+    // |          |
+    // |   top    |
+    // |          |
+    // 4----------5
     TVector3 *getCorner(bool x, bool y, bool z)
     {
         Int_t i = 0;

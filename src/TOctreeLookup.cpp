@@ -36,7 +36,7 @@ TOctreeLookup::TOctreeLookup(Double_t xmin, Double_t xmax, Double_t ymin, Double
 
     for (Int_t i = 0; i < 8; i++)
     {
-        corners[i] = nullptr;
+        corners[i] = new TVector3(-999,0,0);
     }
 }
 
@@ -72,21 +72,46 @@ void TOctreeLookup::setCorners(std::function<void(Double_t, Double_t, Double_t, 
 {
     for (Int_t i = 0; i < 8; i++)
     {
-        if (corners[i] == nullptr)
+        // Instantiate corner if it doesn't exist
+        if(corners[i] == nullptr){
+            corners[i] = new TVector3(-999,0,0);
+        }
+        else if (corners[i]->X() != -999) // If corner is already set, skip
         {
-            corners[i] = new TVector3(0.0, 0.0, 0.0);
+            continue;
+        }
+        switch (i) { // Set corner based on index
+            case 0:
+                func(fXmin, fYmin, fZmin, corners[0]);
+                break;
+            case 1:
+                func(fXmax, fYmin, fZmin, corners[1]);
+                break;
+            case 2:
+                func(fXmin, fYmax, fZmin, corners[2]);
+                break;
+            case 3:
+                func(fXmax, fYmax, fZmin, corners[3]);
+                break;
+            case 4:
+                func(fXmin, fYmin, fZmax, corners[4]);
+                break;
+            case 5:
+                func(fXmax, fYmin, fZmax, corners[5]);
+                break;
+            case 6:
+                func(fXmin, fYmax, fZmax, corners[6]);
+                break;
+            case 7:
+                func(fXmax, fYmax, fZmax, corners[7]);
+                break;
+            default:
+                throw std::runtime_error("This shouldn't be possible...");                
+                break;
         }
     }
+    return;
 
-    func(fXmin, fYmin, fZmin, corners[0]);
-    func(fXmax, fYmin, fZmin, corners[1]);
-    func(fXmax, fYmin, fZmin, corners[1]);
-    func(fXmin, fYmax, fZmin, corners[2]);
-    func(fXmax, fYmax, fZmin, corners[3]);
-    func(fXmin, fYmin, fZmax, corners[4]);
-    func(fXmax, fYmin, fZmax, corners[5]);
-    func(fXmin, fYmax, fZmax, corners[6]);
-    func(fXmax, fYmax, fZmax, corners[7]);
 };
 
 void TOctreeLookup::subdivide()
@@ -98,14 +123,252 @@ void TOctreeLookup::subdivide()
     Double_t xmid = (fXmin + fXmax) / 2;
     Double_t ymid = (fYmin + fYmax) / 2;
     Double_t zmid = (fZmin + fZmax) / 2;
+
+    // Shares corner 0 with parent
     children[0] = new TOctreeLookup(fXmin, xmid, fYmin, ymid, fZmin, zmid);
+    for(int i = 0; i < 8; i++){
+        switch (i) {
+            case 0:
+                children[0]->setCorner(0, this->getCorner(0));
+                break;
+            default:
+                TVector3 *vec = new TVector3(-999,0,0);
+                children[0]->setCorner(i,vec);
+                break;
+        }
+    }
+
+    // Shares corner 1 with parent
+    // Shares 4 corners with sibling 0
+    // 1-0: 0-1, 2-3, 4-5, 
     children[1] = new TOctreeLookup(xmid, fXmax, fYmin, ymid, fZmin, zmid);
+    for(int i = 0; i < 8; i++){
+        switch (i) {
+            case 0:
+                children[1]->setCorner(0, children[0]->getCorner(1));
+                break;
+            case 1:
+                children[1]->setCorner(1,this->getCorner(1));
+                break;
+            case 2:
+                children[1]->setCorner(2, children[0]->getCorner(3));
+                break;
+            case 4:
+                children[1]->setCorner(4, children[0]->getCorner(5));
+                break;
+            case 6:
+                children[1]->setCorner(6, children[0]->getCorner(7));
+            default:
+                TVector3 *vec = new TVector3(-999,0,0);
+                children[1]->setCorner(i,vec);
+                break;
+        }
+    }
+
+    // Shares corner 2 with parent
+    // Shares 4 corners with sibling 0
+    // Shares 2 corners with sibling 1, which are already included in the share with sibling 0
+    // 2-0: 0-2, 1-3, 4-6, 5-7 
     children[2] = new TOctreeLookup(fXmin, xmid, ymid, fYmax, fZmin, zmid);
+    for(int i = 0; i < 8; i++){
+        switch (i) {
+            case 0:
+                children[2]->setCorner(0, children[0]->getCorner(2));
+                break;
+            case 1:
+                children[2]->setCorner(1, children[0]->getCorner(3));
+                break;
+            case 2:
+                children[2]->setCorner(2,this->getCorner(2));
+                break;
+            case 4:
+                children[2]->setCorner(4, children[0]->getCorner(6));
+                break;
+            case 5:
+                children[2]->setCorner(5, children[0]->getCorner(7));
+            default:
+                TVector3 *vec = new TVector3(-999,0,0);
+                children[2]->setCorner(i,vec);
+                break;
+        }
+    }
+    
+    // Shares corner 3 with parent
+    // Share 4 corners with sibling 2
+    // Share 2 more corners with sibling 1
+    // 3-2: 0-1, 2-3, 4-5, 6-7
+    // 3-1: 1-3, 5-7
     children[3] = new TOctreeLookup(xmid, fXmax, ymid, fYmax, fZmin, zmid);
+    for(int i = 0; i < 8; i++){
+        switch (i) {
+            case 0:
+                children[3]->setCorner(0, children[2]->getCorner(1));
+                break;
+            case 1:
+                children[3]->setCorner(1, children[1]->getCorner(3));
+                break;
+            case 2:
+                children[3]->setCorner(2, children[2]->getCorner(3));
+                break;
+            case 3:
+                children[3]->setCorner(3, this->getCorner(3));
+                break;
+            case 4:
+                children[3]->setCorner(4, children[2]->getCorner(5));
+                break;
+            case 5:
+                children[3]->setCorner(5, children[1]->getCorner(7));
+                break;
+            case 6:
+                children[3]->setCorner(6, children[2]->getCorner(7));
+                break;
+            default:
+                TVector3 *vec = new TVector3(-999,0,0);
+                children[3]->setCorner(i,vec);
+                break;
+        }
+    }
+    // Shares corner 4 with parent
+    // Bottom 4 corners are the top 4 corners of sibling 0
+    // 4-0: 0-4, 1-5, 2-6, 3-7
     children[4] = new TOctreeLookup(fXmin, xmid, fYmin, ymid, zmid, fZmax);
+    for(int i = 0; i < 8; i++){
+        switch (i) {
+            case 0:
+                children[4]->setCorner(0, children[0]->getCorner(4));
+                break;
+            case 1:
+                children[4]->setCorner(1, children[0]->getCorner(5));
+                break;
+            case 2:
+                children[4]->setCorner(2, children[0]->getCorner(6));
+                break;
+            case 3:
+                children[4]->setCorner(3, children[0]->getCorner(7));
+                break;
+            case 4:
+                children[4]->setCorner(4,this->getCorner(4));
+                break;
+            default:
+                TVector3 *vec = new TVector3(-999,0,0);
+                children[4]->setCorner(i,vec);
+                break;
+        }
+    }
+
+    // Shares corner 5 with parent
+    // Bottom 4 corners are the top 4 corners of sibling 1
+    // Top 2 corners on the left are the top 2 corners on the right of sibling 4
+    // 5-1: 0-4, 1-5, 2-6, 3-7
+    // 5-4: 4-5, 6-7
     children[5] = new TOctreeLookup(xmid, fXmax, fYmin, ymid, zmid, fZmax);
+    for(int i = 0; i < 8; i++){
+        switch (i) {
+            case 0:
+                children[5]->setCorner(0, children[1]->getCorner(4));
+                break;
+            case 1:
+                children[5]->setCorner(1, children[1]->getCorner(5));
+                break;
+            case 2:
+                children[5]->setCorner(2, children[1]->getCorner(6));
+                break;
+            case 3:
+                children[5]->setCorner(3, children[1]->getCorner(7));
+                break;
+            case 4:
+                children[5]->setCorner(4, children[4]->getCorner(5));
+                break;
+            case 5:
+                children[5]->setCorner(5, this->getCorner(5));
+                break;
+            case 6:
+                children[5]->setCorner(6, children[4]->getCorner(7));
+                break;
+            default:
+                TVector3 *vec = new TVector3(-999,0,0);
+                children[5]->setCorner(i,vec);
+                break;
+        }
+    }
+
+    // Shares corner 6 with parent
+    // Bottom 4 corners are the top 4 corners of sibling 2
+    // Top back 2 corners are the top front 2 corners of sibling 4
+    // 6-2: 0-4, 1-5, 2-6, 3-7
+    // 6-4: 4-6, 5-7
     children[6] = new TOctreeLookup(fXmin, xmid, ymid, fYmax, zmid, fZmax);
+    for(int i = 0; i < 8; i++){
+        switch (i) {
+            case 0:
+                children[6]->setCorner(0, children[2]->getCorner(4));
+                break;
+            case 1:
+                children[6]->setCorner(1, children[2]->getCorner(5));
+                break;
+            case 2:
+                children[6]->setCorner(2, children[2]->getCorner(6));
+                break;
+            case 3:
+                children[6]->setCorner(3, children[2]->getCorner(7));
+                break;
+            case 4:
+                children[6]->setCorner(4, children[4]->getCorner(6));
+                break;
+            case 5:
+                children[6]->setCorner(5, children[4]->getCorner(7));
+                break;
+            case 6:
+                children[6]->setCorner(6, this->getCorner(6));
+                break;
+            default:
+                TVector3 *vec = new TVector3(-999,0,0);
+                children[6]->setCorner(i,vec);
+                break;
+        }
+    }
+
+    // Shares corner 7 with parent
+    // Bottom 4 corners are the top 4 corners of sibling 3
+    // Top 2 corners on the left are the top 2 corners on the right of sibling 6
+    // Back right corner is the front right corner of sibling 5
+    // 7-3: 0-4, 1-5, 2-6, 3-7
+    // 7-6: 4-5, 6-7
+    // 7-5: 5-7
     children[7] = new TOctreeLookup(xmid, fXmax, ymid, fYmax, zmid, fZmax);
+    for(int i = 0; i < 8; i++){
+        switch (i) {
+            case 0:
+                children[7]->setCorner(0, children[3]->getCorner(4));
+                break;
+            case 1:
+                children[7]->setCorner(1, children[3]->getCorner(5));
+                break;
+            case 2:
+                children[7]->setCorner(2, children[3]->getCorner(6));
+                break;
+            case 3:
+                children[7]->setCorner(3, children[3]->getCorner(7));
+                break;
+            case 4:
+                children[7]->setCorner(4, children[6]->getCorner(5));
+                break;
+            case 5:
+                children[7]->setCorner(5, children[5]->getCorner(7));
+                break;
+            case 6:
+                children[7]->setCorner(6, children[6]->getCorner(7));
+                break;
+            case 7:
+                children[7]->setCorner(7, this->getCorner(7));
+                break;
+            default:
+                throw std::runtime_error("This shouldn't be possible...");
+                break;
+        }
+    }
+
+    // Set parent and depth
     for (Int_t i = 0; i < 8; i++)
     {
         children[i]->parent = this;
